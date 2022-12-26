@@ -3,7 +3,14 @@ const AppError = require("../utils/appError");
 const handleJWTError = () =>
   new AppError("Invalid token, please log in again", 401);
 
+const handleJWTExpiredError = () =>
+  new AppError("Your token has expired, please log in again", 401);
+
+const handleDuplicateEmail = () =>
+  new AppError("This email is already exist", 400);
+
 const sendErrorDev = (err, res) => {
+  console.log(err.keyValue);
   res.status(err.statusCode).json({
     status: err.status,
     error: err,
@@ -14,11 +21,10 @@ const sendErrorDev = (err, res) => {
 
 const sendErrorProd = (err, res) => {
   // operational trusted error: send message to client
-  console.log(err);
-  if (err.isOperational) {
+  if (err.isOperational || err.code === 11000) {
     res.status(err.statusCode).json({
       status: err.status,
-      message: err.message,
+      message: `${err.message}`,
     });
 
     // programming or other unknown error: send message to client
@@ -37,12 +43,13 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || "error";
 
   if (process.env.NODE_ENV === "development") {
-    console.log("development");
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === "production") {
-    let error = { ...err };
-    console.log(error, "Production");
+    let error = err;
     if (error.name === "JsonWebTokenError") error = handleJWTError();
+    if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
+    if (error.code == 11000 && error.keyValue.email === req.body.email)
+      error = handleDuplicateEmail();
 
     sendErrorProd(error, res);
   }

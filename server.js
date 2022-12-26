@@ -10,10 +10,12 @@ const DB = process.env.DATABASE.replace(
 );
 
 mongoose.set("strictQuery", true);
+mongoose.set("useCreateIndex", true);
 mongoose
   .connect(DB, {
-    useNewUrlParser: true,
+    useNewUrlParser: true,  
     useUnifiedTopology: true,
+    useCreateIndex: true,
   })
   .then((con) => {
     console.log("Db Connection Successfull");
@@ -21,5 +23,7 @@ mongoose
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
-  console.log(`App running on port ${port}`);
+  console.log(
+    `App running on ${process.env.NODE_ENV} environment at port ${port}`
+  );
 });

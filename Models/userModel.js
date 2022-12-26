@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const catchAsync = require("../utils/catchAsync");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -67,5 +68,7 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   // False means not changed
   return false;
 };
+
+
 const User = mongoose.model("User", userSchema);
 module.exports = User;
