@@ -10,7 +10,6 @@ const handleDuplicateEmail = () =>
   new AppError("This email is already exist", 400);
 
 const sendErrorDev = (err, res) => {
-  console.log(err.keyValue);
   res.status(err.statusCode).json({
     status: err.status,
     error: err,
