@@ -1,5 +1,6 @@
 const express = require("express");
 const registerDeviceController = require("../Controllers/registerDeviceController");
+const authController = require("../Controllers/authController");
 const router = express.Router();
 
 router.route("/").get(registerDeviceController.getAllRegisterDevice);
@@ -10,8 +11,14 @@ router
   .route("/:id")
   .get(registerDeviceController.getRegisterDevice)
   .patch(registerDeviceController.updateRegisterDevice)
-  .delete(registerDeviceController.deleteRegisterDevice);
+  .delete(
+    authController.protect,
+    authController.restrictTo("admin"),
+    registerDeviceController.deleteRegisterDevice
+  );
 
-router.route("/register-device").post(registerDeviceController.registerDevice);
+router
+  .route("/register-device")
+  .post(authController.protect, registerDeviceController.registerDevice);
 
 module.exports = router;

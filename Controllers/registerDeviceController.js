@@ -3,7 +3,10 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
 exports.registerDevice = catchAsync(async (req, res) => {
-  const device = await registerDevice.create(req.body);
+  const device = await registerDevice.create({
+    user: req.user.id,
+    ...req.body,
+  });
 
   res.status(201).json({
     status: "success",
